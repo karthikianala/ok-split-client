@@ -2,6 +2,7 @@ import type { RouteObject } from "react-router-dom";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { ProtectedRoute } from "./guards";
 import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
+import { groupRoutes } from "./groups.routes";
 
 export const dashboardRoutes: RouteObject[] = [
   {
@@ -11,8 +12,7 @@ export const dashboardRoutes: RouteObject[] = [
         element: <DashboardLayout />,
         children: [
           { path: "/dashboard", element: <DashboardPage /> },
-          { path: "/groups", element: <Placeholder title="Groups" /> },
-          { path: "/groups/:id", element: <Placeholder title="Group Detail" /> },
+          ...groupRoutes,
           { path: "/analytics", element: <Placeholder title="Analytics" /> },
           { path: "/settings", element: <Placeholder title="Settings" /> },
         ],

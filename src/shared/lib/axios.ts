@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.PUBLIC_API_URL ?? "http://localhost:5000/api";
+// In dev, requests go through Rsbuild proxy (localhost:3000/api → localhost:5000/api)
+// In prod, set PUBLIC_API_URL to the actual backend URL
+const API_URL = import.meta.env.PUBLIC_API_URL ?? "/api";
 
 // Auth endpoints that should NOT trigger token refresh on 401
 const AUTH_ENDPOINTS = ["/auth/login", "/auth/register", "/auth/refresh"];
