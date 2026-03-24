@@ -3,6 +3,8 @@ import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { ProtectedRoute } from "./guards";
 import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
 import { groupRoutes } from "./groups.routes";
+import { expenseRoutes } from "./expenses.routes";
+import { analyticsRoutes } from "./analytics.routes";
 
 export const dashboardRoutes: RouteObject[] = [
   {
@@ -13,7 +15,8 @@ export const dashboardRoutes: RouteObject[] = [
         children: [
           { path: "/dashboard", element: <DashboardPage /> },
           ...groupRoutes,
-          { path: "/analytics", element: <Placeholder title="Analytics" /> },
+          ...expenseRoutes,
+          ...analyticsRoutes,
           { path: "/settings", element: <Placeholder title="Settings" /> },
         ],
       },
