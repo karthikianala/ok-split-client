@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Settings, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthStore } from "@/shared/stores/authStore";
@@ -7,6 +8,7 @@ import { useGroupDetail } from "../hooks/useGroupDetail";
 import { useDeleteGroup } from "../hooks/useGroups";
 import { MemberList } from "../components/MemberList";
 import { AddMemberDialog } from "../components/AddMemberDialog";
+import { EditGroupDialog } from "../components/EditGroupDialog";
 import { AddExpenseDialog } from "@/features/expenses/components/AddExpenseDialog";
 import { ExpenseCard } from "@/features/expenses/components/ExpenseCard";
 import { GroupBalanceSummary } from "@/features/expenses/components/GroupBalanceSummary";
@@ -14,15 +16,20 @@ import { useExpenses, useDeleteExpense } from "@/features/expenses/hooks/useExpe
 import { SettleUpDialog } from "@/features/settlements/components/SettleUpDialog";
 import { SettlementList } from "@/features/settlements/components/SettlementList";
 import { ActivityFeed } from "@/features/activity/components/ActivityFeed";
+import { useGroupRealtime } from "@/shared/hooks/useSignalR";
 
 export function GroupDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const [expensePage, setExpensePage] = useState(1);
   const { data: group, isLoading } = useGroupDetail(id!);
-  const { data: expenseData } = useExpenses(id!);
+  const { data: expenseData, isLoading: expensesLoading } = useExpenses(id!, expensePage);
   const deleteGroup = useDeleteGroup();
   const deleteExpense = useDeleteExpense(id!);
+
+  // Real-time updates via SignalR
+  useGroupRealtime(id);
 
   if (isLoading) {
     return (
@@ -69,9 +76,7 @@ export function GroupDetailPage() {
         </div>
         {isAdmin && (
           <div className="flex gap-2">
-            <Button variant="outline" size="icon" title="Settings">
-              <Settings className="h-4 w-4" />
-            </Button>
+            <EditGroupDialog group={group} />
             <Button
               variant="outline"
               size="icon"
@@ -101,21 +106,52 @@ export function GroupDetailPage() {
           <AddExpenseDialog groupId={group.id} members={group.members} />
         </CardHeader>
         <CardContent>
-          {!expenseData?.expenses.length ? (
+          {expensesLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-20 bg-muted animate-pulse rounded" />
+              ))}
+            </div>
+          ) : !expenseData?.expenses.length ? (
             <p className="text-sm text-muted-foreground text-center py-6">
               No expenses yet. Add one to get started!
             </p>
           ) : (
-            <div className="space-y-3">
-              {expenseData.expenses.map((expense) => (
-                <ExpenseCard
-                  key={expense.id}
-                  expense={expense}
-                  currentUserRole={currentMember?.role ?? "Member"}
-                  onDelete={(id) => deleteExpense.mutate(id)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="space-y-3">
+                {expenseData.expenses.map((expense) => (
+                  <ExpenseCard
+                    key={expense.id}
+                    expense={expense}
+                    currentUserRole={currentMember?.role ?? "Member"}
+                    onDelete={(expenseId) => deleteExpense.mutate(expenseId)}
+                  />
+                ))}
+              </div>
+              {expenseData.totalCount > 20 && (
+                <div className="flex items-center justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setExpensePage((p) => p - 1)}
+                    disabled={expensePage <= 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {expensePage} of {Math.ceil(expenseData.totalCount / 20)}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setExpensePage((p) => p + 1)}
+                    disabled={expensePage >= Math.ceil(expenseData.totalCount / 20)}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

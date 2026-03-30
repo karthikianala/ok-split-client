@@ -1,0 +1,22 @@
+{
+  "name": "OkSplit — Share & Split Responsibly",
+  "short_name": "OkSplit",
+  "description": "Split expenses with friends easily",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2DBAA0",
+  "icons": [
+    {
+      "src": "/logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ]
+}

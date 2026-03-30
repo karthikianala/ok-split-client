@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCreateExpense } from "../hooks/useExpenses";
+import { ReceiptUpload } from "./ReceiptUpload";
 import { EXPENSE_CATEGORIES } from "@/shared/types/expense.types";
 import type { Member } from "@/shared/types/group.types";
 
@@ -35,6 +36,7 @@ interface AddExpenseDialogProps {
 
 export function AddExpenseDialog({ groupId, members }: AddExpenseDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [receiptUrl, setReceiptUrl] = useState<string | undefined>();
   const createExpense = useCreateExpense(groupId);
 
   const {
@@ -83,6 +85,7 @@ export function AddExpenseDialog({ groupId, members }: AddExpenseDialogProps) {
       {
         onSuccess: () => {
           reset();
+          setReceiptUrl(undefined);
           setIsOpen(false);
         },
       }
@@ -192,6 +195,12 @@ export function AddExpenseDialog({ groupId, members }: AddExpenseDialogProps) {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Receipt Upload */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Receipt <span className="text-muted-foreground">(optional)</span></label>
+            <ReceiptUpload value={receiptUrl} onChange={setReceiptUrl} />
           </div>
 
           {/* Notes */}

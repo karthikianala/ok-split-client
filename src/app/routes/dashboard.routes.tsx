@@ -5,6 +5,7 @@ import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
 import { groupRoutes } from "./groups.routes";
 import { expenseRoutes } from "./expenses.routes";
 import { analyticsRoutes } from "./analytics.routes";
+import { settingsRoutes } from "./settings.routes";
 
 export const dashboardRoutes: RouteObject[] = [
   {
@@ -17,17 +18,9 @@ export const dashboardRoutes: RouteObject[] = [
           ...groupRoutes,
           ...expenseRoutes,
           ...analyticsRoutes,
-          { path: "/settings", element: <Placeholder title="Settings" /> },
+          ...settingsRoutes,
         ],
       },
     ],
   },
 ];
-
-function Placeholder({ title }: { title: string }) {
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">{title}</h1>
-    </div>
-  );
-}
